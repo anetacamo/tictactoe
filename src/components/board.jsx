@@ -1,6 +1,42 @@
 import React, { Component } from "react";
 import Button from "./button";
 
+function getMatrix(rowsAndColumns) {
+  return [
+    Array(rowsAndColumns).fill().map((e,i) => {
+      return Array(rowsAndColumns).fill().map(e => i === 0 ? 'X' : '')
+    })
+  ]
+}
+
+const ourMatrix = [
+  ['X', 'X', 'X'],
+  ['', '', ''],
+  ['', '', '']
+]
+
+const matrix = getMatrix(3)
+
+function calculateWinner(matrix) {
+  let winner = null
+  matrix.forEach((row, index) => {
+    row.forEach((column, j) => {
+      if(column !== '' && j > 0 && j < row.length - 1) {
+        const lastColumn = row[j-1]
+        const nextColumn = row[j+1]
+        const isLastColumnIdentical = lastColumn === column
+        const isNextColumnIdentical = nextColumn === column
+        if(isLastColumnIdentical && isNextColumnIdentical){
+          winner = column
+        }
+      }
+    })
+  })
+  return winner
+}
+
+console.log(calculateWinner(ourMatrix))
+
 class Board extends Component {
   constructor(props) {
     super(props);
@@ -9,7 +45,12 @@ class Board extends Component {
       squares: Array(9).fill(null),
       widths: [3,4,6,10],
       player: "X",
-      winner: ""
+      winner: "",
+      matrix: [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+      ]
     };
   }
   handleClick(i) {
@@ -110,6 +151,7 @@ class Board extends Component {
   }
 
   render () {
+    console.log("re-render")
     var winner = this.calculateWinner();
     let nextturn = 'Next player: ' + this.state.player;
     return(
