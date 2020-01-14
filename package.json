@@ -2,7 +2,8 @@
   "name": "game",
   "version": "0.1.0",
   "private": true,
-  "hoomepage": "https://anetacamo.github.io/tictactoe",
+  "homepage": "https://anetacamo.github.io/tictactoe",
+  "main": "build/index.html",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",

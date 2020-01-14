@@ -15,6 +15,7 @@ const ourMatrix = [
   ['', '', '']
 ]
 
+console.log('Aneta is pretty')
 const matrix = getMatrix(3)
 
 function calculateWinner(matrix) {
