@@ -3,9 +3,10 @@ body {
 }
 
 .board-container {
-  background-color: #4d00e2;
-  padding: 2px;
   margin: 20px auto;
+  display: flex;
+  flex-wrap: wrap;
+  border: 2px solid #4d00e2;
 }
 .width-3 {
   width: 180px;
@@ -24,24 +25,39 @@ body {
   height: 600px;
 }
 
-button {
+.square {
+  width: 60px;
+  height: 60px;
+}
+.button-large,
+.square {
   border: 2px solid #4d00e2;
   font-size: 40px;
   font-weight: 800;
   outline: none;
+  box-sizing: border-box;
+  text-align: center;
 }
-button:hover {
+.button-large:hover,
+.square:hover {
   background: #4d00e2;
-  cursor: pointer;
   color: white;
   transition-duration: 250ms;
 }
+.button-large {
+  display: inline-block;
+  padding: 8px 24px;
+}
+.button-large,
+.button,
 .square {
-  width: 60px;
-  height: 60px;
+  cursor: pointer;
 }
 .status {
   padding-top: 12px;
   font-size: 20px;
   font-weight: 600;
+}
+.board-container p {
+  margin: 0;
 }

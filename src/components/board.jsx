@@ -1,182 +1,119 @@
-import React, { Component } from "react";
-import Button from "./button";
+import React, { useState } from 'react';
+import Button from './button';
+import { useEffect } from 'react';
 
-function getMatrix(rowsAndColumns) {
-  return [
-    Array(rowsAndColumns).fill().map((e,i) => {
-      return Array(rowsAndColumns).fill().map(e => i === 0 ? 'X' : '')
-    })
-  ]
-}
+const Board = () => {
+  const [width, setWidth] = useState(3);
+  const [player, setPlayer] = useState('X');
+  const [squares, setSquares] = useState([]);
+  const [widths, setWidths] = useState([3, 4, 6, 10, 20]);
+  const [winner, setWinner] = useState('');
 
-const ourMatrix = [
-  ['X', 'X', 'X'],
-  ['', '', ''],
-  ['', '', '']
-]
+  useEffect(() => {
+    const fields = Array(width * width).fill(null);
+    setSquares(fields);
+    setWinner('');
+  }, [width]);
 
-console.log('Aneta is pretty')
-const matrix = getMatrix(3)
-
-function calculateWinner(matrix) {
-  let winner = null
-  matrix.forEach((row, index) => {
-    row.forEach((column, j) => {
-      if(column !== '' && j > 0 && j < row.length - 1) {
-        const lastColumn = row[j-1]
-        const nextColumn = row[j+1]
-        const isLastColumnIdentical = lastColumn === column
-        const isNextColumnIdentical = nextColumn === column
-        if(isLastColumnIdentical && isNextColumnIdentical){
-          winner = column
-        }
-      }
-    })
-  })
-  return winner
-}
-
-console.log(calculateWinner(ourMatrix))
-
-class Board extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      width: 3,
-      squares: Array(9).fill(null),
-      widths: [3,4,6,10],
-      player: "X",
-      winner: "",
-      matrix: [
-        ['', '', ''],
-        ['', '', ''],
-        ['', '', '']
-      ]
-    };
-  }
-  handleClick(i) {
-    const squares = this.state.squares;
+  const handleClick = (i) => {
     if (squares[i] === null) {
-      squares[i] = this.state.player;
-      this.setState({squares});
-      var player = this.state.player;
-      player === "X" ? player = "O" : player = "X"
-      this.setState({player});
+      squares[i] = player;
+      setSquares(squares);
+      var turn = player;
+      player === 'X' ? (turn = 'O') : (turn = 'X');
+      setPlayer(turn);
+      calculateWinner();
     }
-  }
-  updateArray(number) {
-    const squares = Array(number * number).fill(null)
-    this.setState({squares});
-    this.setState({ width:number });
-  }
+  };
 
-  calculateWinner() {
-    const squares = this.state.squares;
+  const calculateWinner = () => {
+    const makeLines = (direction) => {
+      while (direction.length > 0) {
+        chunk = direction.splice(0, width);
+        lines.push(chunk);
+      }
+    };
+
     const lines = [];
-
-    //VERTICAL
-    var width = this.state.width;
+    var chunk;
+    var i;
+    var j;
+    var squared = width * width + 1;
     var horizontals = [];
-    for (var i, i = 0; i < (width*width); i++) {
+
+    //Horizontals
+    for (i = 1; i < squared; i++) {
       horizontals.push(i);
     }
-    var chunk
-    while (horizontals.length > 0) {
-      chunk = horizontals.splice(0,width)
-      lines.push(chunk)
-    }
+    makeLines(horizontals);
 
-    var verticals = [];
-    for (var i, i = 0; i < width; i++) {
-      for (var j, j = i; j < (width*width); j+=(width)) {
-        verticals.push(j);
+    //Verticals
+    for (i = 1; i < width + 1; i++) {
+      for (j = i; j < squared; j += width) {
+        horizontals.push(j);
       }
     }
-    var chunk
-    while (verticals.length > 0) {
-      chunk = verticals.splice(0,width)
-      lines.push(chunk)
-    }
+    makeLines(horizontals);
 
-
-    //DIAGONALS
-    var diagonals = [];
-    var row = 3
-
-    // here we only want top right
-    for (var i, i = (row - 1); i < width; i++) {
-      for (var j, j = i; j < (width*width); j+=(width-1)) {
+    //Diagonals
+    for (i = 1; i < width + 1; i++) {
+      for (j = i; j < i * width - 1; j += width - 1) {
+        horizontals.push(j);
       }
     }
+    for (i = 1; i < width + 1; i++) {
+      chunk = horizontals.splice(0, i);
+      lines.push(chunk);
+    }
 
-    // top left
-    for (var i, i = 0; i < (width - row + 1); i++) {
-      for (var j, j = i; j < (width*width); j+=(width+1)) {
+    //Diagonals II
+    for (i = 1; i < width + 1; i++) {
+      for (j = i; j < squared - (width * i - width); j += width + 1) {
+        horizontals.push(j);
       }
     }
-
-
-    var printing = "";
-
-    lines.forEach(function(line) {
-      printing = printing + "-";
-      line.forEach(function(item) {
-        if (squares[item] !== null) {
-          printing = printing + squares[item];
-        }
-      });
-    })
-    var winner = "";
-    console.log(printing)
-
-    if (printing.includes("XXX")) {
-      return winner = "X made 3!";
-      console.log(winner)
+    for (i = width; i > 0; i--) {
+      chunk = horizontals.splice(0, i);
+      lines.push(chunk);
     }
-    if (printing.includes("XXXX")) {
-      return winner = "X made 4!";
-    }
-    if (printing.includes("XXXXX")) {
-      return winner = "X made 5!";
-    }
-    if (printing.includes("OOO")) {
-      return winner = "O made 3!";
-    }
-    if (printing.includes("OOOO")) {
-      return winner = "O made 4!";
-      console.log(winner)
-    }
-    if (printing.includes("OOOOO")) {
-      return winner = "O made 5!";
-    }
-  }
 
-  render () {
-    console.log("re-render")
-    var winner = this.calculateWinner();
-    let nextturn = 'Next player: ' + this.state.player;
-    return(
-      <div>
-        <button onClick={() => this.updateArray(3)}>New Game</button>
+    var printing = '';
+    lines.forEach((line) => {
+      line.forEach((l) => (printing = printing + squares[l - 1]));
+      printing = printing + '-';
+    });
 
-        {this.state.widths.map(width =>
-          <p onClick={() => this.updateArray(width)}>play {width}x{width}</p>
-        )}
+    if (printing.includes('XXX')) {
+      setWinner('X wins!');
+    }
+    if (printing.includes('OOO')) {
+      setWinner('O wins!');
+    }
+  };
 
-        <div className="status">{nextturn}</div>
-        <div className="status">{winner}</div>
-        <div className={`board-container width-${this.state.width}`}>
-          {this.state.squares.map((square,index) =>
-            <Button
-              onClick={() => this.handleClick(index)}
-              value={this.state.squares[index]}
-              key={index}
-            />
-          )}
-        </div>
+  return (
+    <div>
+      <div className='button-large' onClick={() => setWidth(3)}>
+        New Game
       </div>
-    )
-  }
-}
+      {widths.map((width) => (
+        <p key={width} onClick={() => setWidth(width)} className='button'>
+          play {width}x{width}
+        </p>
+      ))}
+      <div className='status'>Next player {player}</div>
+      <div className='status'>{winner}</div>
+      <div className={`board-container width-${width}`}>
+        {squares.map((square, index) => (
+          <Button
+            value={squares[index]}
+            key={index}
+            onClick={() => handleClick(index)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default Board;
